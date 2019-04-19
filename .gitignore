@@ -55,3 +55,7 @@ dkms.conf
 cmake-build-debug/
 kernel/kernel
 funcionesCompartidas/build
+example/client
+example/server
+example/logC
+example/logS
