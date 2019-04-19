@@ -106,10 +106,13 @@ int main()
     fd_set listaDeSocketsTemporal;
     int valorSocketMasAlto = 0;
     int newClientSocket;
+    //limpiamos las listas de socket
     FD_ZERO(&listaDeSockets);
     FD_ZERO(&listaDeSocketsTemporal);
-
+    //cargamos el socket server a la lista no temporal de socket
     FD_SET(socketServer, &listaDeSockets);
+    //cargamos el valor mas alto del socket mayor q tengamos en este saco es el server
+    //cada socket nuevo q nos del el SO va ser siempre creeciente
     valorSocketMasAlto = socketServer;
 
     while (1)
@@ -140,7 +143,9 @@ int main()
                     log_info(log, "nos llego un nuevo mensaje del socket client %d",FDsocket);
                     if(leerMensaje(FDsocket,log) < 0){
                         log_info(log, "se desconecto el socket client %d",FDsocket);
+                        //cerramos el socket que se desconecto
                         close(FDsocket);
+                        //lo sacamos de la lista de socket no temporal
                         FD_CLR(FDsocket, &listaDeSockets);
                     }
                 }
