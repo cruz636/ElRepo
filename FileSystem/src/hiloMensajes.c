@@ -6,13 +6,14 @@
  */
 
 #include "hiloMensajes.h"
+#include <pthread.h>
 
-void tratarMensaje(mensaje mensRecibido){
+void tratarMensajes(int socket){
 
 
 
 
-	free(mensRecibido);
-	pthread_exit();
+
+	pthread_exit(NULL);
 }
 

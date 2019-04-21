@@ -10,7 +10,7 @@
 
 
 void inicializar();
-void archivoDeCofiguracion(char* argv);
+void archivoDeConfiguracion(char* argv);
 int leer_metadata();
 int abrir_bitmap();
 void finalizar();

@@ -15,7 +15,12 @@ typedef struct {
 	char* buffer;
 }mensaje;
 
-void tratarMensaje(mensaje mensRecibido);
+typedef struct {
+	int socket;
+	pthread_t hilo;
+}cliente_t;
+
+void tratarMensajes(int socket);
 
 
 #endif /* FILE_SYSTEM_SRC_HILOMENSAJES_H_ */

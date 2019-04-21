@@ -5,25 +5,46 @@
  *      Author: utnso
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <funcionesCompartidas/log.h>
 #include <commons/config.h>
 #include <commons/string.h>
+#include <commons/log.h>
 #include <commons/bitarray.h>
 #include <errno.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <string.h>
+#include <sys/stat.h>
 
 struct stat mystat;
+
+extern char* puerto;
+extern char* montaje;
+extern int retardo;
+extern int tam_value;
+extern int tiempo_dump;
+
+extern char* magic_number;
+extern int tBloques;
+extern int cantBloques;
+
+extern t_dictionary * clientes;
+extern t_log* alog;
+extern t_bitarray* bitmap;
+extern char* posicion;
+extern int bitm;
 
 void inicializar(){
 	montaje = strdup("");
 	magic_number = strdup("");
 	puerto = strdup("");
-	log = crear_archivo_log('File System', true, '/home/utnso/Escritorio');
+	clientes = dictionary_create();
+	alog = crear_archivo_log("File System", true, "/home/utnso/Escritorio");
 }
 
-void archivoDeCofiguracion(char* argv)
+void archivoDeConfiguracion(char* argv)
 {
 	t_config *configuracion;
 	printf("ruta archivo de configuacion: %s \n", argv);
@@ -34,7 +55,7 @@ void archivoDeCofiguracion(char* argv)
 	tam_value = config_get_int_value(configuracion, "TAMAÑO_VALUE");
 	tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP");
 
-	log_info(log, "Lee el archivo de configuracion");
+	log_info(alog, "Lee el archivo de configuracion");
 
 
 	config_destroy(configuracion);
@@ -57,7 +78,7 @@ int leer_metadata()
 	if(strcmp(magic_number, "LISSANDRA"))
 	{
 		config_destroy(configuracion);
-		log_info(log, "No es LISSANDRA");
+		log_info(alog, "No es LISSANDRA");
 		free(ruta);
 		return -1;
 	}
@@ -83,7 +104,7 @@ int abrir_bitmap()
 	int fdbitmap = open(ruta,O_RDWR);
 	free(ruta);
 	if(fdbitmap==0){
-		log_info(log,"no abrio el bitmap\n");
+		log_info(alog,"no abrio el bitmap\n");
 		close(fdbitmap);
 		return -1;
 	}
@@ -92,7 +113,7 @@ int abrir_bitmap()
 
 	posicion = mmap(0,mystat.st_size,PROT_READ|PROT_WRITE,MAP_SHARED,fdbitmap,0);
 	if(posicion == MAP_FAILED){
-		log_info(log,"error en mmap\n");
+		log_info(alog,"error en mmap\n");
 		fprintf(stderr, "mmap failed: %s\n", strerror(errno));
 		close(fdbitmap);
 		return -1;
@@ -116,7 +137,9 @@ void finalizar(){
 		bitarray_destroy(bitmap);
 	}
 	free(posicion);
-	liberar_log();
+	dictionary_clean(clientes);
+	dictionary_destroy(clientes);
+	liberar_log(alog);
 }
 
 
