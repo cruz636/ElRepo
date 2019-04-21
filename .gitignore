@@ -54,6 +54,7 @@ dkms.conf
 .idea/
 cmake-build-debug/
 kernel/kernel
+kernel/kernelLog
 funcionesCompartidas/build
 example/client
 example/server
