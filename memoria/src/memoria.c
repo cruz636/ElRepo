@@ -3,7 +3,7 @@
 #include <funcionesCompartidas/funcionesNET.h>
 
 int main(){
-    t_log *file_log = crear_archivo_log("Kernel", true,"/home/utnso/git/tp-2019-1c-misc/memoria/log");
+    t_log *file_log = crear_archivo_log("Kernel", true,"./memoriaLog");
     log_info(file_log, "cargando el archivo de configuracion");
     int control = 0;
     log_info(file_log,"estableciendo conexion");
