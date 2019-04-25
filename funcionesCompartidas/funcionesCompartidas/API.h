@@ -37,6 +37,14 @@ typedef struct {
 } __attribute__((packed)) structInsert;
 
 typedef struct {
+    size_t size_operacion;
+    size_t size_nametable;
+    size_t size_key;
+    size_t size_value;
+    size_t size_timestamp;
+} __attribute__((packed)) stInsertSize;
+
+typedef struct {
     enum OPERACION operacion;
     char * nameTable;
 }__attribute__((packed)) structDrop;
@@ -45,5 +53,7 @@ structInsert * cargarInsert(char * comando, bool requireTimeStamp);
 structSelect * cargarSelect(char * comando);
 structCreate * cargarCreate(char * comando);
 structDrop * cargarDrop(char * comando);
+void * serealizarInsert(structInsert * insert, size_t  * length);
+structInsert * desserealizarInsert(void * buffer);
 
 #endif //KERNEL_API_H

@@ -114,3 +114,60 @@ structDrop * cargarDrop(char * comando){
     _drop->nameTable = strdup(listSplit[1]);
     return _drop;
 }
+
+void * serealizarInsert(structInsert * insert, size_t  * length){
+    stInsertSize sizeStruct;
+    sizeStruct.size_operacion = sizeof(insert->operacion);
+    sizeStruct.size_nametable = strlen(insert->nameTable) + 1;
+    sizeStruct.size_key = sizeof(insert->key);
+    sizeStruct.size_value = strlen(insert->value) + 1;
+    sizeStruct.size_timestamp = sizeof(insert->timestamp);
+    size_t sizeBuffer = sizeof(sizeStruct) + sizeStruct.size_operacion + sizeStruct.size_nametable + sizeStruct.size_key + sizeStruct.size_value + sizeStruct.size_timestamp;
+    void * buffer = malloc(sizeBuffer);
+    int offset = 0;
+    memcpy(buffer,&sizeStruct, sizeof(sizeStruct));
+    offset += sizeof(sizeStruct);
+
+    memcpy((buffer + offset),&insert->operacion,sizeStruct.size_operacion);
+    offset += sizeStruct.size_operacion;
+
+    memcpy((buffer + offset),insert->nameTable,sizeStruct.size_nametable);
+    offset += sizeStruct.size_nametable;
+
+    memcpy((buffer + offset),&insert->key,sizeStruct.size_key);
+    offset += sizeStruct.size_key;
+
+    memcpy((buffer + offset),insert->value,sizeStruct.size_value);
+    offset += sizeStruct.size_value;
+
+    memcpy((buffer + offset),&insert->timestamp,sizeStruct.size_timestamp);
+    *length = sizeBuffer;
+    return buffer;
+}
+
+structInsert * desserealizarInsert(void * buffer){
+    stInsertSize sizeStruct;
+    structInsert * insert = malloc(sizeof(structInsert *));
+    int offset = 0;
+
+    memcpy(&sizeStruct,(buffer + offset), sizeof(sizeStruct));
+    offset += sizeof(sizeStruct);
+
+    memcpy(&insert->operacion,(buffer + offset), sizeStruct.size_operacion);
+    offset += sizeStruct.size_operacion;
+
+    insert->nameTable = malloc(sizeStruct.size_nametable);
+    memcpy(insert->nameTable,(buffer + offset), sizeStruct.size_nametable);
+    offset += sizeStruct.size_nametable;
+
+    memcpy(&insert->key,(buffer + offset), sizeStruct.size_key);
+    offset += sizeStruct.size_key;
+
+    insert->value = malloc(sizeStruct.size_value);
+    memcpy(insert->value,(buffer + offset), sizeStruct.size_value);
+    offset += sizeStruct.size_value;
+
+    memcpy(&insert->timestamp,(buffer + offset), sizeStruct.size_timestamp);
+
+    return insert;
+}
