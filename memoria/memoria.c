@@ -1,10 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include <funcionesCompartidas/funcionesNET.h>
+#include <funcionesCompartidas/log.h>
 #include <pthread.h>
+
 
 
 struct log{
@@ -14,39 +11,27 @@ struct log{
 
 
 
+t_log *log_server;
+
 void *funcionServer(char *PUERTO) {
-  struct sockaddr_in direccionServer;
-  direccionServer.sin_family = AF_INET;
-  direccionServer.sin_addr.s_addr = INADDR_ANY;
-  direccionServer.sin_port = htons(atoi(PUERTO));
 
-  int server = socket(AF_INET,SOCK_STREAM,0);
+  int control = 0;
+  int socketServer = makeListSocket(PUERTO,log_server, &control);
 
-  if(bind(server, (void*) &direccionServer,sizeof(direccionServer)) != 0){
-    perror("[-] Fallo en el bind. \n");
-    exit(-1);
+
+  int cliente = aceptar_conexion(socketServer,log_server,&control);
+  if(control == 0){
+    log_info(log_server,"todo ok\n");
   }
-
-  printf("[+] Server escuchando..\n" );
-  listen(server,10);
-
-  struct sockaddr_in direccionCliente;
-  unsigned int lenDireccion;
-
-  int cliente = accept(server, (void *) &direccionCliente, &lenDireccion);
 
   printf("[+] Se conectó el cliente %d\n", cliente );
 
-  char paquete[] = "[+] Mensaje recibido!";
-  char* buffer = malloc(5);
+  void buffer;
+  header request;
 
-  int bytesRecibidos = recv(cliente,buffer,1000,0);
 
-  printf("[+] Mensaje del cliente : %s\n",buffer );
-  //free(buffer);
-
-  send(cliente,paquete,sizeof(paquete),0);
-
+  buffer = getMessage(cliente,&request,&control);
+  
   for(;;);
 
 }
@@ -67,7 +52,7 @@ void *funcionClient(struct log *memoria){
   int cliente = socket(AF_INET,SOCK_STREAM,0);
   if(connect(cliente,(void *) &direccionServer,sizeof(direccionServer)) != 0){
     perror("[-] Error al conectarse con el servidor \n");
-    exit(-1);
+    //exit(-1);
   }
 
   send(cliente,paquete,strlen(paquete),0);
@@ -92,6 +77,9 @@ int main(int argc, char *argv[]) {
 //  char direccionIP[16];
   //char direccionPuerto[5];
   char miPuerto[5];
+  log_server = crear_archivo_log("Server",true,"./LogS");
+
+
 
 
   //creamos la struct con los datos sacados del log
@@ -115,7 +103,7 @@ int main(int argc, char *argv[]) {
 
 
   pthread_create(&servidor,NULL, &funcionServer, miPuerto);
-  //pthread_create(&cliente,NULL, &funcionClient,(void *) &memoria1); //pasamos puerto y direccion con un struct
+ // pthread_create(&cliente,NULL, &funcionClient,(void *) &memoria1); //pasamos puerto y direccion con un struct
   pthread_join(servidor,NULL);
   //pthread_join(cliente,NULL);
 
