@@ -4,12 +4,13 @@
 #include "consola.h"
 
 t_log *file_log;
+config * configuracion;
 
 
 int main(int argc, char **argv){
     file_log = crear_archivo_log("Kernel", true,"./kernelLog");
     log_info(file_log, "cargando el archivo de configuracion");
-    config * configuracion = load_config(argv[1]);
+    configuracion = load_config(argv[1]);
     if(!configuracion) {
         log_error(file_log, "no se pudo cargar el archivo de configuracion");
     }
