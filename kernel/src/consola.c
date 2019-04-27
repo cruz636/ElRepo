@@ -9,7 +9,11 @@ extern t_log* file_log;
 
 void enviarMjs(void * buffer){
     int control= 0;
-    int client = establecerConexion("","8954",file_log,&control);
+    int client = establecerConexion("10.5.62.23","8954",file_log,&control);
+    if (control != 0) {
+        log_error(file_log, "Error al intentar establecer conneccion");
+        return;
+    }
     if (enviar_message(client, buffer, file_log, &control) < 0) {
         log_info(file_log, "Error al enviar el bloque");
     }
