@@ -1,10 +1,19 @@
 //
 // Created by miguelchauca on 21/04/19.
 //
-
+#include <funcionesCompartidas/API.h>
+#include <funcionesCompartidas/funcionesNET.h>
 #include "consola.h"
 
 extern t_log* file_log;
+
+void enviarMjs(void * buffer){
+    int control= 0;
+    int client = establecerConexion("","8954",file_log,&control);
+    if (enviar_message(client, buffer, file_log, &control) < 0) {
+        log_info(file_log, "Error al enviar el bloque");
+    }
+}
 
 void armarComando(char * comando){
     bool flagErro = true;
@@ -14,6 +23,14 @@ void armarComando(char * comando){
         flagErro = false;
         flagErrorSintaxis = true;
         if((insert = cargarInsert(comando, true))){
+            size_t lenght;
+            void * insertSerealizado = serealizarInsert(insert,&lenght);
+            header request;
+            request.letra = 'K';
+            request.codigo = 1;
+            request.sizeData = lenght;
+            void * buffer = createMessage(&request,insertSerealizado);
+            enviarMjs(buffer);
             flagErrorSintaxis = false;
             log_info(file_log, "EJECUTANDO COMANDO INSERT");
         }
