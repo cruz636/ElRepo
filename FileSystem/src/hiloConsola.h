@@ -10,6 +10,7 @@
 
 
 void* hiloconsola();
+int getEnumFromString ( const char *string );
 
 
 #endif /* FILESYSTEM_SRC_HILOCONSOLA_H_ */

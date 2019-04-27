@@ -11,7 +11,8 @@
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
 #include <commons/collections/dictionary.h>
-#include "hiloMensajes.h"
+
+#include "hiloClientes.h"
 
 extern int controlador;
 extern int socketfs;
@@ -34,7 +35,8 @@ void * hiloselect(){
 			cliente_t * cliente = malloc(sizeof(cliente_t));
 
 			log_info(alog, "Se conecto un nuevo cliente");
-			pthread_create(&hilo, NULL, (void*)tratarMensajes,&cliente);
+			pthread_create(&hilo, NULL, (void*)tratarCliente,&cliente);
+			pthread_detach(hilo);
 
 			cliente->socket = nuevo_socket;
 			cliente->hilo = hilo;

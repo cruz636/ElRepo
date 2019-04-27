@@ -41,7 +41,7 @@ void inicializar(){
 	magic_number = strdup("");
 	puerto = strdup("");
 	clientes = dictionary_create();
-	alog = crear_archivo_log("File System", true, "/home/utnso/Escritorio");
+	alog = crear_archivo_log("File System", true, "/home/utnso/Escritorio/log.txt");
 }
 
 void archivoDeConfiguracion(char* argv)
@@ -75,7 +75,7 @@ int leer_metadata()
 	cantBloques = config_get_int_value(configuracion, "CANTIDAD_BLOQUES");
 	string_append(&magic_number, config_get_string_value(configuracion, "MAGIC_NUMBER"));
 
-	if(strcmp(magic_number, "LISSANDRA"))
+	if(strcmp(magic_number, "SADICA"))
 	{
 		config_destroy(configuracion);
 		log_info(alog, "No es LISSANDRA");
@@ -137,6 +137,7 @@ void finalizar(){
 		bitarray_destroy(bitmap);
 	}
 	free(posicion);
+	//Falta cerrar los hilos de clientes que hayan quedado abiertos
 	dictionary_clean(clientes);
 	dictionary_destroy(clientes);
 	liberar_log(alog);

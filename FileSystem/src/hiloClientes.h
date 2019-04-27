@@ -8,6 +8,8 @@
 #ifndef FILE_SYSTEM_SRC_HILOMENSAJES_H_
 #define FILE_SYSTEM_SRC_HILOMENSAJES_H_
 
+#include <pthread.h>
+#include <semaphore.h>
 #include <funcionesCompartidas/funcionesNET.h>
 
 typedef struct {
@@ -18,9 +20,10 @@ typedef struct {
 typedef struct {
 	int socket;
 	pthread_t hilo;
+	sem_t semaforo;
 }cliente_t;
 
-void tratarMensajes(int socket);
+void tratarCliente(int socketC);
 
 
 #endif /* FILE_SYSTEM_SRC_HILOMENSAJES_H_ */

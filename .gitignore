@@ -64,3 +64,8 @@ example/LogS
 example/pthreadServer
 logC
 logS
+
+.project
+.settings/
+.cproject
+FileSystem/FileSystem

@@ -1,2 +1,2 @@
 compiler: 
-	gcc -o "File System" ./src/*.c -lpthread -lcommons -lcompartidas
+	gcc -o "FileSystem" ./src/*.c -lpthread  -lreadline -lcommons -lcompartidas
