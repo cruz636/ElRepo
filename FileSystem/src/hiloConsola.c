@@ -20,19 +20,18 @@ extern t_log* alog;
 void* hiloconsola(){
 	int flag = 1;
 
-	char *ingreso;
-	char *identi;
+	char *request;
+	size_t tamBuffer = 100;
 
 	log_info(alog, "Se creo el hilo consola");
 
 	while(flag){
 
-		ingreso = readline("\n");
+		request = malloc(sizeof(char) * tamBuffer);
 
-		identi = strtok(ingreso, " ");
+		getline(&request, &tamBuffer, stdin);
 
-
-		switch(getEnumFromString(identi))
+		switch(getEnumFromString(request))
 		{
 			case 1:
 				log_info(alog, "Recibi un Insert");
@@ -59,7 +58,8 @@ void* hiloconsola(){
 				log_info(alog, "Mensaje incorrecto");
 
 			}
-		free(ingreso);
+		free(request);
+		//free(identi);
 
 	}
 
@@ -67,9 +67,9 @@ void* hiloconsola(){
 	pthread_exit(NULL);
 }
 
-int getEnumFromString ( const char *string ) {
+int getEnumFromString ( char *string ) {
     static struct {
-        const char *s;
+        char *s;
         enum OPERACION e;
     } map[] = {
         { "INSERT", INSERT },
@@ -79,7 +79,8 @@ int getEnumFromString ( const char *string ) {
     };
 
     for ( int i = 0 ; i < sizeof(map)/sizeof(map[0]); i++ ) {
-        if ( strcmp(string ,map[i].s) == 0 ) {
+
+        if (string_starts_with(string,map[i].s) /*strcmp(string ,map[i].s) == 0 */) {
             return map[i].e;
         }
     }

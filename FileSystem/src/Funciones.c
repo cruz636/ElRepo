@@ -110,7 +110,7 @@ int abrir_bitmap()
 
 	fstat(fdbitmap,&mystat);
 
-	posicion = mmap(0,mystat.st_size,PROT_READ|PROT_WRITE,MAP_SHARED,fdbitmap,0);
+	posicion = (char *)mmap(0,mystat.st_size,PROT_READ|PROT_WRITE,MAP_SHARED,fdbitmap,0);
 	if(posicion == MAP_FAILED){
 		log_info(alog,"error en mmap\n");
 		fprintf(stderr, "mmap failed: %s\n", strerror(errno));
@@ -118,6 +118,8 @@ int abrir_bitmap()
 		return -1;
 	}
 	bitmap = bitarray_create_with_mode(posicion,mystat.st_size, LSB_FIRST);
+
+	close(fdbitmap);
 
 	log_info(alog, "Abre el bitmap");
 
@@ -138,7 +140,7 @@ void finalizar(){
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
 	}
-	free(posicion);
+	//free(posicion);
 	//Falta cerrar los hilos de clientes que hayan quedado abiertos
 	dictionary_clean(clientes);
 	dictionary_destroy(clientes);
