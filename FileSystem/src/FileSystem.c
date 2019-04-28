@@ -50,16 +50,19 @@ int main(int argc, char *argv[]) {
 	metadata = leer_metadata();
 	bitm = abrir_bitmap();
 
+
 	if(!(metadata ==-1 || bitm ==-1)){
-		pthread_create(&hiloSelect, NULL, (void*)hiloSelect,NULL);
-		pthread_create(&hiloConsola, NULL, (void*)hiloConsola,NULL);
+		//pthread_create(&hiloSelect, NULL, (void*)hiloselect,NULL);
+		pthread_create(&hiloConsola, NULL, (void*)hiloconsola,NULL);
 
 
-		pthread_join(hiloSelect,NULL);
+		//pthread_join(hiloSelect,NULL);
 		pthread_join(hiloConsola, NULL);
 	}
 
+
 	finalizar();
+
 	return EXIT_SUCCESS;
 }
 

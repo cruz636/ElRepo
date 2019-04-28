@@ -13,20 +13,21 @@
 #include <commons/log.h>
 #include <funcionesCompartidas/API.h>
 #include "hiloConsola.h"
+#include <string.h>
 
 extern t_log* alog;
 
 void* hiloconsola(){
-	int flag = 0;
+	int flag = 1;
 
 	char *ingreso;
 	char *identi;
 
-
+	log_info(alog, "Se creo el hilo consola");
 
 	while(flag){
 
-		scanf("%ms", &ingreso);
+		ingreso = readline("\n");
 
 		identi = strtok(ingreso, " ");
 
@@ -54,13 +55,15 @@ void* hiloconsola(){
 				break;
 
 			default:
-				flag = 1;
+				flag = 0;
 				log_info(alog, "Mensaje incorrecto");
 
 			}
+		free(ingreso);
+
 	}
 
-
+	log_info(alog, "Sale del hilo consola");
 	pthread_exit(NULL);
 }
 

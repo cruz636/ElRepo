@@ -17,6 +17,8 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 struct stat mystat;
 
@@ -71,22 +73,19 @@ int leer_metadata()
 
 	configuracion = config_create(ruta);
 
-	tBloques = config_get_int_value(configuracion, "TAMANIO_BLOQUES");
-	cantBloques = config_get_int_value(configuracion, "CANTIDAD_BLOQUES");
+	tBloques = config_get_int_value(configuracion, "BLOCK_SIZE");
+	cantBloques = config_get_int_value(configuracion, "BLOCKS");
 	string_append(&magic_number, config_get_string_value(configuracion, "MAGIC_NUMBER"));
 
-	if(strcmp(magic_number, "SADICA"))
+	log_info(alog, "Se lee la metadata del File System");
+
+	if(strcmp(magic_number, "LISSANDRA"))
 	{
 		config_destroy(configuracion);
 		log_info(alog, "No es LISSANDRA");
 		free(ruta);
 		return -1;
 	}
-
-	//escribir_log_con_numero("Tamanio de Bloques: ", tBloques);
-	//escribir_log_con_numero("Cantidad de bloques: ", cantBloques);
-	//string_append(&magic_number, "\n");
-	//escribir_log_compuesto("Magic Number: ",magic_number);
 
 	free(ruta);
 	config_destroy(configuracion);
@@ -118,14 +117,17 @@ int abrir_bitmap()
 		close(fdbitmap);
 		return -1;
 	}
-	bitmap = bitarray_create_with_mode(posicion,mystat.st_size,LSB_FIRST);
+	bitmap = bitarray_create_with_mode(posicion,mystat.st_size, LSB_FIRST);
 
+	log_info(alog, "Abre el bitmap");
 
 	return 0;
 
 }
 
 void finalizar(){
+
+	log_info(alog, "Esta por finalizar las variables");
 
 	free(montaje);
 	free(magic_number);

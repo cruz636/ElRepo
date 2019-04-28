@@ -24,8 +24,13 @@ void * hiloselect(){
 	//sockets
 
 	controlador=0;
+
+	log_info(alog, "Se creo el hilo servidor");
+
 	socketfs = makeListenSock(puerto, alog, &controlador);
 	if(socketfs < 0) pthread_exit(NULL);
+
+	log_info(alog, "Se creo el socket server");
 
 	while(1)//controlador ==6?
 	{
@@ -38,6 +43,8 @@ void * hiloselect(){
 			pthread_create(&hilo, NULL, (void*)tratarCliente,&cliente);
 			pthread_detach(hilo);
 
+			log_info(alog, "Se creo el hilo del cliente");
+
 			cliente->socket = nuevo_socket;
 			cliente->hilo = hilo;
 
@@ -46,8 +53,8 @@ void * hiloselect(){
 
 	}
 
+
 	pthread_exit(NULL);
 }
-
 
 
