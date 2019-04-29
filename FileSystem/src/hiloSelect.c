@@ -32,23 +32,37 @@ void * hiloselect(){
 
 	log_info(alog, "Se creo el socket server");
 
-	while(1)//controlador ==6?
+	while(1)
 	{
 		int nuevo_socket = aceptar_conexion(socketfs, alog, &controlador);
 		if(nuevo_socket != -1){
-			pthread_t hilo;
-			cliente_t * cliente = malloc(sizeof(cliente_t));
 
-			log_info(alog, "Se conecto un nuevo cliente");
-			pthread_create(&hilo, NULL, (void*)tratarCliente,&cliente);
-			pthread_detach(hilo);
+			mensaje * recibido = malloc(sizeof(mensaje));
 
-			log_info(alog, "Se creo el hilo del cliente");
+			recibido->buffer = getMessage(nuevo_socket, &(recibido->head), &controlador);
 
-			cliente->socket = nuevo_socket;
-			cliente->hilo = hilo;
+			if(recibido->head.letra == 'M'){
+				pthread_t hilo;
+				cliente_t * cliente = malloc(sizeof(cliente_t));
 
-			dictionary_put(clientes, string_itoa(nuevo_socket), cliente);
+				log_info(alog, "Se conecto un nuevo cliente");
+				pthread_create(&hilo, NULL, (void*)tratarCliente,&cliente);
+				pthread_detach(hilo);
+
+				log_info(alog, "Se creo el hilo del cliente");
+
+				cliente->socket = nuevo_socket;
+				cliente->hilo = hilo;
+
+				dictionary_put(clientes, string_itoa(nuevo_socket), cliente);
+			}else{
+				log_info(alog, "Se conecto un cliente incorrecto");
+				close(nuevo_socket);
+			}
+
+			free(recibido->buffer);
+			free(recibido);
+
 		}
 
 	}

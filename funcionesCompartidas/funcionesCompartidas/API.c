@@ -9,7 +9,11 @@ structInsert * cargarInsert(char * comando, bool requireTimeStamp){
     structInsert * insert = malloc(sizeof(structInsert));
     insert->operacion = INSERT;
     char ** listSplit = string_split(comando, "\"");
+    char ** listSplit2;
     if(listSplit[1] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(insert);
         return  NULL;
     }
@@ -18,29 +22,57 @@ structInsert * cargarInsert(char * comando, bool requireTimeStamp){
         if(listSplit[2]){
             insert->timestamp = strtol(listSplit[2],&hayString,10);
             if(!string_is_empty(hayString)){
+            	string_iterate_lines(listSplit, (void*)free);
+            	free(listSplit);
+
                 free(insert);
                 return NULL;
             }
         }else{
+        	string_iterate_lines(listSplit, (void*)free);
+        	free(listSplit);
+
             free(insert);
             return  NULL;
         }
     }
-    listSplit = string_split(listSplit[0]," ");
-    if(listSplit[1] == NULL){
+
+    listSplit2 = string_split(listSplit[0]," ");
+    if(listSplit2[1] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(insert);
         return NULL;
     }
-    insert->nameTable = strdup(listSplit[1]);
-    if(listSplit[2] == NULL){
+
+    insert->nameTable = strdup(listSplit2[1]);
+    if(listSplit2[2] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
+    	string_iterate_lines(listSplit2, (void*)free);
+    	free(listSplit2);
+
         free(insert);
         return NULL;
     }
-    insert->key = strtol(listSplit[2],&hayString,10);
+    insert->key = strtol(listSplit2[2],&hayString,10);
     if(!string_is_empty(hayString)){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
+    	string_iterate_lines(listSplit2, (void*)free);
+    	free(listSplit2);
         free(insert);
         return NULL;
     }
+
+    string_iterate_lines(listSplit, (void*)free);
+    free(listSplit);
+
+    string_iterate_lines(listSplit2, (void*)free);
+    free(listSplit2);
     return insert;
 }
 
@@ -50,19 +82,31 @@ structSelect * cargarSelect(char * comando){
     _select->operacion = SELECT;
     char ** listSplit = string_split(comando, " ");
     if(listSplit[1] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_select);
         return  NULL;
     }
     _select->nameTable = strdup(listSplit[1]);
     if(listSplit[2] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_select);
         return  NULL;
     }
     _select->key = strtol(listSplit[2],&hayString,10);
     if(!string_is_empty(hayString)){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_select);
         return NULL;
     }
+
+    string_iterate_lines(listSplit, (void*)free);
+    free(listSplit);
     return _select;
 }
 
@@ -72,33 +116,54 @@ structCreate * cargarCreate(char * comando){
     _create->operacion = CREATE;
     char ** listSplit = string_split(comando, " ");
     if(listSplit[1] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_create);
         return NULL;
     }
     _create->nameTable = strdup(listSplit[1]);
     if(listSplit[2] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_create);
         return  NULL;
     }
     _create->tipoConsistencia = strdup(listSplit[2]);
     if(listSplit[3] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_create);
         return  NULL;
     }
     _create->numeroParticiones = strtol(listSplit[3],&hayString,10);
     if(!string_is_empty(hayString)){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_create);
         return NULL;
     }
     if(listSplit[4] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_create);
         return  NULL;
     }
     _create->compactionTime = strtol(listSplit[4],&hayString,10);
     if(!string_is_empty(hayString)){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_create);
         return NULL;
     }
+
+    string_iterate_lines(listSplit, (void*)free);
+    free(listSplit);
     return _create;
 
 }
@@ -108,10 +173,16 @@ structDrop * cargarDrop(char * comando){
     _drop->operacion = DROP;
     char ** listSplit = string_split(comando, " ");
     if(listSplit[1] == NULL){
+    	string_iterate_lines(listSplit, (void*)free);
+    	free(listSplit);
+
         free(_drop);
         return NULL;
     }
     _drop->nameTable = strdup(listSplit[1]);
+
+    string_iterate_lines(listSplit, (void*)free);
+    free(listSplit);
     return _drop;
 }
 

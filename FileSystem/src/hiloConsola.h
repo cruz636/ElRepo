@@ -8,9 +8,12 @@
 #ifndef FILESYSTEM_SRC_HILOCONSOLA_H_
 #define FILESYSTEM_SRC_HILOCONSOLA_H_
 
+#include "manejoArchivos.h"
 
 void* hiloconsola();
 int getEnumFromString ( char *string );
+void mostrarRespuesta(structRespuesta* respuesta);
+structInsert * cargarInserts(char * comando, bool requireTimeStamp);
 
 
 #endif /* FILESYSTEM_SRC_HILOCONSOLA_H_ */
