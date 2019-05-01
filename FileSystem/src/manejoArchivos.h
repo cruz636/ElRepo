@@ -11,13 +11,23 @@
 #include <funcionesCompartidas/API.h>
 
 typedef struct {
+	char * consistency;
+	int partitions;
+	int compaction_time;
 
-}structRespuesta;
+}structMetadata;
 
-structRespuesta * realizarInsert(structInsert * insert);
-structRespuesta * realizarSelect(structSelect * select);
-structRespuesta * realizarCreate(structCreate * create);
-structRespuesta * realizarDrop(structDrop * drop);
+typedef struct {
+	int Size;
+	char ** bloques;
+}structParticion;
+
+int realizarInsert(structInsert * insert);
+int realizarSelect(structSelect * select, char ** value);
+int realizarCreate(structCreate * create);
+int realizarDrop(structDrop * drop);
+bool validarArchivos(char * archivo, int* respuesta);
+
 
 
 #endif /* SRC_MANEJOARCHIVOS_H_ */

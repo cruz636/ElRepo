@@ -12,7 +12,7 @@
 
 void* hiloconsola();
 int getEnumFromString ( char *string );
-void mostrarRespuesta(structRespuesta* respuesta);
+void mostrarRespuesta(int respuesta);
 structInsert * cargarInserts(char * comando, bool requireTimeStamp);
 
 

@@ -19,30 +19,28 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "Funciones.h"
 
 struct stat mystat;
-
-extern char* puerto;
-extern char* montaje;
-extern int retardo;
-extern int tam_value;
-extern int tiempo_dump;
 
 extern char* magic_number;
 extern int tBloques;
 extern int cantBloques;
 
-extern t_dictionary * clientes;
+extern structConfig * config;
+extern t_dictionary * clientes, *memtable;
 extern t_log* alog;
 extern t_bitarray* bitmap;
 extern char* posicion;
 extern int bitm;
 
 void inicializar(){
-	montaje = strdup("");
+	config = malloc(sizeof(structConfig));
+	config->montaje = strdup("");
 	magic_number = strdup("");
-	puerto = strdup("");
+	config->puerto = strdup("");
 	clientes = dictionary_create();
+	memtable = dictionary_create();
 	alog = crear_archivo_log("File System", true, "/home/utnso/Escritorio/log.txt");
 }
 
@@ -51,11 +49,11 @@ void archivoDeConfiguracion(char* argv)
 	t_config *configuracion;
 	printf("ruta archivo de configuacion: %s \n", argv);
 	configuracion = config_create(argv);
-	string_append(&puerto, config_get_string_value(configuracion, "PUERTO_ESCUCHA​"));
-	string_append(&montaje, config_get_string_value(configuracion, "PUNTO_MONTAJE"));
-	retardo = config_get_int_value(configuracion, "RETARDO");
-	tam_value = config_get_int_value(configuracion, "TAMAÑO_VALUE");
-	tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP");
+	string_append(&config->puerto, config_get_string_value(configuracion, "PUERTO_ESCUCHA​"));
+	string_append(&config->montaje, config_get_string_value(configuracion, "PUNTO_MONTAJE"));
+	config->retardo = config_get_int_value(configuracion, "RETARDO");
+	config->tam_value = config_get_int_value(configuracion, "TAMAÑO_VALUE");
+	config->tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP");
 
 	log_info(alog, "Lee el archivo de configuracion");
 
@@ -68,7 +66,7 @@ int leer_metadata()
 	char *ruta = strdup("");
 	t_config *configuracion;
 
-	string_append(&ruta,montaje);
+	string_append(&ruta,config->montaje);
 	string_append(&ruta,"/Metadata/Metadata.bin");
 
 	configuracion = config_create(ruta);
@@ -97,7 +95,7 @@ int abrir_bitmap()
 {
 	char *ruta = strdup("");
 
-	string_append(&ruta,montaje);
+	string_append(&ruta,config->montaje);
 	string_append(&ruta,"/Metadata/Bitmap.bin");
 
 	int fdbitmap = open(ruta,O_RDWR);
@@ -131,19 +129,22 @@ void finalizar(){
 
 	log_info(alog, "Esta por finalizar las variables");
 
-	free(montaje);
+	free(config->montaje);
 	free(magic_number);
-	free(puerto);
+	free(config->puerto);
+	free(config);
 	if(bitm != -1){
 		memcpy(posicion,bitmap,mystat.st_size);
 		msync(posicion,mystat.st_size,MS_SYNC);
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
 	}
-	//free(posicion);
 	//Falta cerrar los hilos de clientes que hayan quedado abiertos
 	dictionary_clean(clientes);
 	dictionary_destroy(clientes);
+
+	dictionary_clean(memtable);
+	dictionary_destroy(memtable);
 	liberar_log(alog);
 }
 

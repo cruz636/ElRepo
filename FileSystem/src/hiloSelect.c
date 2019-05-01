@@ -11,14 +11,14 @@
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
 #include <commons/collections/dictionary.h>
-
+#include "Funciones.h"
 #include "hiloClientes.h"
 
 extern int controlador;
 extern int socketfs;
 extern t_log* alog;
-extern char* puerto;
 extern t_dictionary * clientes;
+extern structConfig * config;
 
 void * hiloselect(){
 	//sockets
@@ -27,7 +27,7 @@ void * hiloselect(){
 
 	log_info(alog, "Se creo el hilo servidor");
 
-	socketfs = makeListenSock(puerto, alog, &controlador);
+	socketfs = makeListenSock(config->puerto, alog, &controlador);
 	if(socketfs < 0) pthread_exit(NULL);
 
 	log_info(alog, "Se creo el socket server");

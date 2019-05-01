@@ -19,11 +19,6 @@
 #include <commons/collections/dictionary.h>
 #include <commons/bitarray.h>
 
-char* puerto;
-char* montaje;
-int retardo;
-int tam_value;
-int tiempo_dump;
 
 char* magic_number;
 int tBloques;
@@ -36,8 +31,9 @@ int controlador;
 char* posicion;
 int bitm;
 
+structConfig * config;
 pthread_t hiloConsola, hiloSelect;
-t_dictionary * clientes;
+t_dictionary * clientes, *memtable;
 
 
 int main(int argc, char *argv[]) {
