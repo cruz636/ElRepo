@@ -2,18 +2,34 @@
 #include <funcionesCompartidas/log.h>
 #include "load_config.h"
 #include "consola.h"
+#include "threadMetadata.h"
+#include "threadPoolMemoria.h"
+#include "planificador.h"
+#include <commons/collections/list.h>
+
 
 t_log *file_log;
 config * configuracion;
+t_list * poolMemoria;
 
 
-int main(int argc, char **argv){
+int inicializar(char * pathConfig){
     file_log = crear_archivo_log("Kernel", true,"./kernelLog");
     log_info(file_log, "cargando el archivo de configuracion");
-    configuracion = load_config(argv[1]);
+    configuracion = load_config(pathConfig);
     if(!configuracion) {
         log_error(file_log, "no se pudo cargar el archivo de configuracion");
+        log_destroy(file_log);
+        return -1;
     }
+}
+
+int main(int argc, char **argv){
+    if(inicializar(argv[1]) < 0){
+        return -1;
+    }
+    inicialPlanificador();
+    loadPoolMemori();
     consola();
     log_destroy(file_log);
     return 0;

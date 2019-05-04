@@ -16,6 +16,11 @@ enum OPERACION{
 
 typedef struct {
     enum OPERACION operacion;
+    void * instruccion;
+}stinstruccion;
+
+typedef struct {
+    enum OPERACION operacion;
     char * nameTable;
     char * tipoConsistencia;
     int numeroParticiones;
@@ -55,5 +60,6 @@ structCreate * cargarCreate(char * comando);
 structDrop * cargarDrop(char * comando);
 void * serealizarInsert(structInsert * insert, size_t  * length);
 structInsert * desserealizarInsert(void * buffer);
+int getEnumFromString ( char *string );
 
 #endif //KERNEL_API_H

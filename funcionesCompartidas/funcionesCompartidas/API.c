@@ -242,3 +242,23 @@ structInsert * desserealizarInsert(void * buffer){
 
     return insert;
 }
+
+int getEnumFromString ( char *string ) {
+    static struct {
+        char *s;
+        enum OPERACION e;
+    } map[] = {
+            { "INSERT", INSERT },
+            { "SELECT", SELECT },
+            { "CREATE", CREATE },
+            { "DROP", DROP }
+    };
+
+    for ( int i = 0 ; i < sizeof(map)/sizeof(map[0]); i++ ) {
+
+        if (string_starts_with(string,map[i].s)) {
+            return map[i].e;
+        }
+    }
+    return -1;
+}
