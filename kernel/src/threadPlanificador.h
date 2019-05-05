@@ -8,7 +8,10 @@
 #include <stdio.h>
 #include <commons/collections/list.h>
 #include <funcionesCompartidas/API.h>
-void inicialPlanificador();
+#include <semaphore.h>
+#include <funcionesCompartidas/log.h>
+#include <unistd.h>
+void * inicialPlanificador();
 void cargarNuevoScript(t_list * listInstrucciones);
 
 #endif //KERNEL_PLANIFICADOR_H

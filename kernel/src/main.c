@@ -4,13 +4,15 @@
 #include "consola.h"
 #include "threadMetadata.h"
 #include "threadPoolMemoria.h"
-#include "planificador.h"
+#include "threadPlanificador.h"
 #include <commons/collections/list.h>
+#include <pthread.h>
 
 
 t_log *file_log;
 config * configuracion;
 t_list * poolMemoria;
+pthread_t plafinifcador;
 
 
 int inicializar(char * pathConfig){
@@ -28,9 +30,10 @@ int main(int argc, char **argv){
     if(inicializar(argv[1]) < 0){
         return -1;
     }
-    inicialPlanificador();
+    pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
     loadPoolMemori();
     consola();
+    pthread_cancel(plafinifcador);
     log_destroy(file_log);
     return 0;
 }

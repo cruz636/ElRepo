@@ -11,7 +11,7 @@
 #include <funcionesCompartidas/API.h>
 #include "load_config.h"
 #include <commons/collections/list.h>
-#include "planificador.h"
+#include "threadPlanificador.h"
 
 void consola();
 
