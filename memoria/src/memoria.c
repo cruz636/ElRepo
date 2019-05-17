@@ -1,111 +1,199 @@
+#include <commons/config.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
-
-
-
-struct log{
-  char IP[16];
-  char PUERTO[5];
-};
-
+#include <funcionesCompartidas/API.h>
 
 
 t_log *log_server;
-
-void *funcionServer(char *PUERTO) {
-
-  printf("[+] Esperando cliente");
-  int control = 0;
-  int socketServer = makeListenSock(PUERTO,log_server, &control);
+t_config * g_config;
 
 
-
-  int cliente = aceptar_conexion(socketServer,log_server,&control);
-  if(control == 0){
-    log_info(log_server,"todo ok\n");
-  }
-
-  printf("[+] Se conectó el cliente %d\n", cliente );
-
-  void *buffer;
-  header request;
-
-
-  buffer = getMessage(cliente,&request,&control);
-  
-  for(;;);
-
-}
-
-
-void *funcionClient(struct log *memoria){
-  struct sockaddr_in direccionServer;
-  char paquete[] = "Este es un mensaje del cliente";
-  char buffer[1024];
-
-  printf("IP: %s\n",memoria -> IP );
-  printf("PUERTO: %d\n",atoi(memoria->PUERTO) );
-
-  direccionServer.sin_family = AF_INET;
-  direccionServer.sin_addr.s_addr = inet_addr(memoria->IP);
-  direccionServer.sin_port = htons(atoi(memoria->PUERTO));
-
-  int cliente = socket(AF_INET,SOCK_STREAM,0);
-  if(connect(cliente,(void *) &direccionServer,sizeof(direccionServer)) != 0){
-    perror("[-] Error al conectarse con el servidor \n");
-    //exit(-1);
-  }
-
-  send(cliente,paquete,strlen(paquete),0);
-  recv(cliente,buffer,1024,0);
-  printf("Buffer: %s\n",buffer );
-
-}
+void *start_server(char *port);
+void *connectToSeeds(int size);
+void start_seeding(char *IP,char *PORT);
+void leerMensaje(void *recibido,header request);
+void enviarMjsString(int socket, t_log * log);
+void enviarAFileSystem(enum OPERACION operacion,size_t sizeBuffer,void * buffer);
 
 
 
 int main(int argc, char *argv[]) {
+    pthread_t servidor;
+    pthread_t client;
+    g_config = config_create("/media/root/bodhi/Facultad/Sistemas Operativos/TP0/tp-2019-1c-misc/memoria/src/memoriaConf.config");
+    char* port = config_get_string_value(g_config,"PUERTO");
+    char* name = config_get_string_value(g_config,"MEM_NUMBER");
 
-  pthread_t servidor;
-  pthread_t cliente;
+    char** ipSeed = config_get_array_value(g_config,"IP_SEED");
+    char** portSeed = config_get_array_value(g_config,"PORT_SEED");
 
-  struct log memoria1 ;
+    printf("PORT: %s\n", port );
+    printf("MEMORY NAME: %s\n", name );
 
-  FILE *logIps;
-  FILE *logPorts;
-  FILE *miLog;
+    int totalSeeds = 0;
+    while (ipSeed[totalSeeds] != '\0') totalSeeds++;
 
-  char miPuerto[5];
-  log_server = crear_archivo_log("Server",true,"./LogS");
+    printf("Total seeds: %d\n",totalSeeds);
 
-  //creamos la struct con los datos sacados del log
+    for(int seed = 0; seed < totalSeeds; seed++){
+      printf("[%i] seed address: %s::%s \n", seed ,ipSeed[seed],portSeed[seed]);
+    }
 
-  //leemos la ip de otra memoria para conectarnos
-  logIps = fopen("/media/root/bodhi/Facultad/Sistemas Operativos/TP0/tp-2019-1c-misc/memoria/src/ips.txt","r");// acá poner la ubicación que corresponde
-  fscanf(logIps,"%s",memoria1.IP);
-  fclose(logIps);
+    printf("\n\n");
+  //that was all the memoriaConf.config info ;)
 
-  //leemos el puerto para conectarnos
-  logPorts = fopen("/media/root/bodhi/Facultad/Sistemas Operativos/TP0/tp-2019-1c-misc/memoria/src/puertos.txt","r"); // acá poner la ubicación que corresponde
-  fscanf(logPorts,"%s",memoria1.PUERTO);
-  fclose(logPorts);
+    log_server = crear_archivo_log(name,true,"./LogS");
 
-  //abrimos nuestro log, y nos fijamos que puerto tenemos asignado
-  miLog = fopen("/media/root/bodhi/Facultad/Sistemas Operativos/TP0/tp-2019-1c-misc/memoria/src/miLog.txt","r");// acá poner la ubicación que corresponde
-  fscanf(miLog,"%s",miPuerto);
-  fclose(miLog);
+    pthread_create(&servidor,NULL, &start_server, port);
+//    pthread_create(&client,NULL, &connectToSeeds,(void *) totalSeeds);
 
-  printf("Mi puerto: %s\n",miPuerto);
+    pthread_join(servidor,NULL);
 
+  //  pthread_join(client,NULL);
 
-  pthread_create(&servidor,NULL, &funcionServer, miPuerto);
-  //pthread_create(&cliente,NULL, &funcionClient,(void *) &memoria1); //pasamos puerto y direccion con un struct
+//the client func are for the gossiping, dont need them now
 
-  pthread_join(servidor,NULL);
-  //pthread_join(cliente,NULL);
-
+    return 0;
+}
 
 
-  return 0;
+
+
+void leerMensaje(void *recibido,header request){
+    if(request.letra == 'K'){
+        switch (request.codigo){
+            case INSERT:{
+                structInsert * instruccionInsert = desserealizarInsert(recibido);
+                //verificar si esta en cache
+                enviarAFileSystem(INSERT,request.sizeData,recibido);
+            }
+            case SELECT:{
+                structSelect * instruccionSelect = desserealizarInsert(recibido);
+                //verificar si esta en cache
+                enviarAFileSystem(SELECT,request.sizeData,recibido);
+            }
+            case CREATE:{
+                structCreate * instruccionCreate = desserealizarInsert(recibido);
+                //..
+                enviarAFileSystem(CREATE,request.sizeData,recibido);
+            }
+            case DROP:{
+                structDrop * intruccionDrop = desserealizarInsert(recibido);
+                //..
+                enviarAFileSystem(DROP,request.sizeData,recibido);
+            }
+        }
+    }
+}
+
+
+void *start_server(char *port){
+  printf("[+] Starting server.. \n");
+
+  int control = 0;
+  int socketServer = makeListenSock(port,log_server, &control);
+
+
+  int client = aceptar_conexion(socketServer,log_server,&control);
+  if(control == 0){
+    log_info(log_server,"todo ok\n");
+  }
+
+  printf("[+] Memory [ID: %d] connected\n", client );
+
+  header request;
+
+  void * recibido;
+  recibido = getMessage(client, &request, &control);
+
+  if(recibido == NULL){
+     perror("[-] It's an empy package :( \n");
+     return -1;
+  }
+
+  leerMensaje(recibido,request);
+
+
+}
+
+
+
+// this next functions are for the gossiping , still in development ;)
+
+void *connectToSeeds(int size){
+  printf("[+] Connecting to the seeds.. \n");
+	printf("-----------------------------\n" );
+  g_config = config_create("memoriaConf.config");
+  char** ipSeed = config_get_array_value(g_config,"IP_SEED");
+	char** portSeed = config_get_array_value(g_config,"PORT_SEED");
+  int sleepTime = config_get_int_value(g_config,"SLEEP");
+
+  sleep(sleepTime);
+
+	for(int v = 1; v < size;v++){ //its start from 2 because the first ip&port its our adress
+
+    char *PORT[5];
+    char IP[16];
+
+    strcpy(IP,*&ipSeed[v]);
+    strcpy(PORT,*&portSeed[v]);
+
+    start_seeding(IP,PORT);
+	}
+
+}
+
+void start_seeding(char *IP,char *PORT){
+
+  t_log *file_log = crear_archivo_log("Kernel", true,"./logC");
+  int control = 0;
+  //log_info(file_log,"estableciendo conexion");
+
+	printf("[+]Connecting to : %s:%s \n",IP,PORT);
+
+
+  int socketClient = establecerConexion(IP,PORT,file_log,&control);
+
+  if (control != 0) {
+      log_error(file_log, "Error al intentar establecer connexión");
+      return -1;
+  }
+
+  enviarMjsString(socketClient,file_log);
+
+	printf("-------------------------\n");
+	sleep(2);
+}
+
+
+
+void enviarMjsString(int socket, t_log * log){
+    // creamos el header
+    char * bloqueData = "hola Como va";
+    int control = 0;
+    header headSend;
+    //para identificar de que componente viene
+    headSend.letra = 'M';
+    //para identificar el tipo de mensaje
+    headSend.codigo = 1;
+    //tamaño de la data que se va enviar en este caso es un string usamos strlen
+    //y le sumamos 1 por que hay q agregarle el \0 el fin de cadena
+    headSend.sizeData = strlen(bloqueData) + 1;
+    //creamos el mjs y nos devuelve el paquetes de datos a enviar pasamos la direccion del header y el bloque de data a enviar
+    message *bufferRes = createMessage(&headSend, bloqueData);
+    //enviamos el mjs se pasa el socket , la direccion del log para logear error interno y un direccion de int para tomar accion
+    //sobre los resultados
+    if (enviar_message(socket, bufferRes, log, &control) < 0) {
+        log_info(log, "Error al enviar el bloque");
+    }
+    log_info(log, "Se envio el mjs vaya a mirar la respuesta en el server");
+}
+
+
+void enviarAFileSystem(enum OPERACION operacion,size_t sizeBuffer,void * buffer){
+    printf("[+] Sending to FL");
 }
