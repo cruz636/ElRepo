@@ -5,14 +5,14 @@
 #ifndef KERNEL_THREADPOOLMEMORIA_H
 #define KERNEL_THREADPOOLMEMORIA_H
 
+#include <stdio.h>
+#include <unistd.h>
 #include <commons/collections/list.h>
 #include "load_config.h"
+#include <funcionesCompartidas/funcionesNET.h>
+#include <funcionesCompartidas/listaMemoria.h>
+#include <pthread.h>
 
-typedef struct {
-    char * ip;
-    char * puerto;
-} memoriaData;
-
-void loadPoolMemori();
+void *loadPoolMemori();
 
 #endif //KERNEL_THREADPOOLMEMORIA_H

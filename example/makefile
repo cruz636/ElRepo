@@ -5,3 +5,4 @@ compiler:
 	gcc -o "pthreadServer.o" ./pthreadServer.c -lpthread -lcommons -lcompartidas
 	gcc -o "hilosicro.o" ./pthread.c -lreadline -lcommons -lcompartidas -lpthread
 	gcc -o "listaMemoria.o" ./listaMemoria.c -lcommons -lcompartidas
+	gcc -o "serverMemoria.o" ./serverMemoria.c -lcommons -lcompartidas

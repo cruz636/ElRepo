@@ -11,8 +11,8 @@
 
 t_log *file_log;
 config * configuracion;
-t_list * poolMemoria;
 pthread_t plafinifcador;
+pthread_t pthreadMemoria;
 
 
 int inicializar(char * pathConfig){
@@ -24,6 +24,7 @@ int inicializar(char * pathConfig){
         log_destroy(file_log);
         return -1;
     }
+    return 0;
 }
 
 int main(int argc, char **argv){
@@ -31,9 +32,10 @@ int main(int argc, char **argv){
         return -1;
     }
     pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
-    loadPoolMemori();
+    pthread_create(&pthreadMemoria,NULL,loadPoolMemori,NULL);
     consola();
     pthread_cancel(plafinifcador);
+    pthread_cancel(pthreadMemoria);
     log_destroy(file_log);
     return 0;
 }

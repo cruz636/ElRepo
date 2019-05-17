@@ -16,7 +16,7 @@ void *consumirNombre(void *arg)
   while (1)
   {
     sem_wait(&nombresDisponibles);
-    sleep(1);
+    sleep(4);
     char * nombre = list_remove(listaNombres, 0);
     printf("se tomo el nombre [%s]\n",nombre);
   }
