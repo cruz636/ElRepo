@@ -7,6 +7,8 @@
 #include <pthread.h>
 #include <funcionesCompartidas/API.h>
 
+#define IPFILESYSTEM "192.168.0.21"
+#define PORTFILESYSTEM "8080"
 #define DIM 5//total pages (?)
 
 t_log *log_server;
@@ -33,9 +35,14 @@ void leerMensaje(void *recibido,header request);
 void enviarMjsString(int socket, t_log * log);
 void enviarAFileSystem(enum OPERACION operacion,size_t sizeBuffer,void * buffer);
 
+void connectToFL(char *IP,char *PORT);
 
 
 int main(int argc, char *argv[]) {
+
+    char *IP_FS = IPFILESYSTEM;
+    char *PORT_FS = PORTFILESYSTEM;
+
 
     for(int i=0;i < DIM ; i++){
         printf("[>] Name of page N°%i : ",i);
@@ -75,6 +82,11 @@ int main(int argc, char *argv[]) {
     printf("\n\n");
   //that was all the memoriaConf.config info ;)
 
+
+    connectToFL(IP_FS,PORT_FS);
+
+
+
     log_server = crear_archivo_log(name,true,"./LogS");
 
     pthread_create(&servidor,NULL, &start_server, port);
@@ -89,6 +101,31 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+
+void connectToFL(char *IP,char *PORT){
+
+    t_log *file_log = crear_archivo_log("Kernel", true,"./logC");
+    int control = 0;
+    log_info(file_log,"getting handshake..");
+
+    printf("[+]Connecting to FILESYSTEM AT : %s:%s \n",IP,PORT);
+
+
+    int socketClient = establecerConexion(IP,PORT,file_log,&control);
+
+    if (control != 0) {
+        log_error(file_log, "Failed to connect.");
+        return -1;
+    }
+
+    enviarMjsString(socketClient,file_log);
+    printf("[+] Getting handshake .\n");
+    printf("-------------------------\n");
+    sleep(2);
+
+
+
+}
 
 
 
@@ -168,10 +205,10 @@ void *start_server(char *port){
 
 void *connectToSeeds(int size){
   printf("[+] Connecting to the seeds.. \n");
-	printf("-----------------------------\n" );
+  printf("-----------------------------\n" );
   g_config = config_create("memoriaConf.config");
   char** ipSeed = config_get_array_value(g_config,"IP_SEED");
-	char** portSeed = config_get_array_value(g_config,"PORT_SEED");
+  char** portSeed = config_get_array_value(g_config,"PORT_SEED");
   int sleepTime = config_get_int_value(g_config,"SLEEP");
 
   sleep(sleepTime);
@@ -193,9 +230,9 @@ void start_seeding(char *IP,char *PORT){
 
   t_log *file_log = crear_archivo_log("Kernel", true,"./logC");
   int control = 0;
-  //log_info(file_log,"estableciendo conexion");
+  log_info(file_log,"estableciendo conexion");
 
-	printf("[+]Connecting to : %s:%s \n",IP,PORT);
+  printf("[+]Connecting to : %s:%s \n",IP,PORT);
 
 
   int socketClient = establecerConexion(IP,PORT,file_log,&control);
@@ -206,9 +243,8 @@ void start_seeding(char *IP,char *PORT){
   }
 
   enviarMjsString(socketClient,file_log);
-
-	printf("-------------------------\n");
-	sleep(2);
+  printf("-------------------------\n");
+  sleep(2);
 }
 
 
