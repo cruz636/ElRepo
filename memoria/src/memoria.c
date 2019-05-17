@@ -9,7 +9,7 @@
 
 #define IPFILESYSTEM "192.168.0.21"
 #define PORTFILESYSTEM "8080"
-#define DIM 5//total pages (?)
+#define DIM 1//total pages (?)
 
 t_log *log_server;
 t_config * g_config;
