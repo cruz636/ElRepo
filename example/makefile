@@ -1,5 +1,8 @@
 compiler:
-	rm -rf client server pthreadServer logS logC 
-	gcc -o "server" ./server.c -lcommons -lcompartidas
-	gcc -o "client" ./client.c -lreadline -lcommons -lcompartidas
-	gcc -o "pthreadServer" ./pthreadServer.c -lpthread -lcommons -lcompartidas
+	rm -rf *.o
+	gcc -o "server.o" ./server.c -lcommons -lcompartidas
+	gcc -o "client.o" ./client.c -lreadline -lcommons -lcompartidas
+	gcc -o "pthreadServer.o" ./pthreadServer.c -lpthread -lcommons -lcompartidas
+	gcc -o "hilosicro.o" ./pthread.c -lreadline -lcommons -lcompartidas -lpthread
+	gcc -o "listaMemoria.o" ./listaMemoria.c -lcommons -lcompartidas
+	gcc -o "serverMemoria.o" ./serverMemoria.c -lcommons -lcompartidas

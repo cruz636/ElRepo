@@ -9,6 +9,9 @@
 #include <commons/log.h>
 #include <stdlib.h>
 #include <funcionesCompartidas/API.h>
+#include "load_config.h"
+#include <commons/collections/list.h>
+#include "threadPlanificador.h"
 
 void consola();
 
