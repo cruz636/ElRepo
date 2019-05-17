@@ -7,9 +7,23 @@
 #include <pthread.h>
 #include <funcionesCompartidas/API.h>
 
+#define DIM 5//total pages (?)
 
 t_log *log_server;
 t_config * g_config;
+
+
+struct segmentTable{
+
+};
+
+struct PageTables{
+    char NAME;
+    int KEY;
+    char VALUE;
+
+}list[DIM];
+
 
 
 void *start_server(char *port);
@@ -22,6 +36,21 @@ void enviarAFileSystem(enum OPERACION operacion,size_t sizeBuffer,void * buffer)
 
 
 int main(int argc, char *argv[]) {
+
+    for(int i=0;i < DIM ; i++){
+        printf("[>] Name of page N°%i : ",i);
+        scanf("%s",&list[i].NAME);
+
+        printf("[>] Key of page N°%i : ",i);
+        scanf("%i",&list[i].KEY);
+
+        printf("[>] Value of page N°%i:",i);
+        scanf("%s",&list[i].VALUE);
+
+        printf("\n--------------------------------------\n");
+    }
+
+
     pthread_t servidor;
     pthread_t client;
     g_config = config_create("/media/root/bodhi/Facultad/Sistemas Operativos/TP0/tp-2019-1c-misc/memoria/src/memoriaConf.config");
@@ -64,7 +93,13 @@ int main(int argc, char *argv[]) {
 
 
 void leerMensaje(void *recibido,header request){
+
+    //we have to know who is seending us the message
     if(request.letra == 'K'){
+
+        // once we know that the sender is de kernel, we have to know which operation is he given us
+        //and send it to the FL
+
         switch (request.codigo){
             case INSERT:{
                 structInsert * instruccionInsert = desserealizarInsert(recibido);
@@ -76,6 +111,13 @@ void leerMensaje(void *recibido,header request){
                 //verificar si esta en cache
                 enviarAFileSystem(SELECT,request.sizeData,recibido);
             }
+
+
+            // -------------------------------------------- //
+            //----------------------------------------------//
+
+            //the next cases arent necessary 4 tomorrow mates ;) ;) ;)
+
             case CREATE:{
                 structCreate * instruccionCreate = desserealizarInsert(recibido);
                 //..
