@@ -5,6 +5,8 @@
 #ifndef KERNEL_LISTAMEMORIA_H
 #define KERNEL_LISTAMEMORIA_H
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <commons/collections/list.h>
 typedef struct
 {

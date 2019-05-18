@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <commons/collections/list.h>
 #include <funcionesCompartidas/listaMemoria.h>
 
@@ -16,7 +18,7 @@ t_list *cargarListMemoria()
   return listaMemoria;
 }
 
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   t_list *de = cargarListMemoria();
   size_t sizeBuffer = 0;
