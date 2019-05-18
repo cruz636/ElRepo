@@ -6,3 +6,4 @@ compiler:
 	gcc -o "hilosicro.o" ./pthread.c -lreadline -lcommons -lcompartidas -lpthread
 	gcc -o "listaMemoria.o" ./listaMemoria.c -lcommons -lcompartidas
 	gcc -o "serverMemoria.o" ./serverMemoria.c -lcommons -lcompartidas
+	gcc -o "listaMetaData.o" ./listaMetadata.c -lcommons -lcompartidas
