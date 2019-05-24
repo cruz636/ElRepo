@@ -11,9 +11,7 @@
 #include "manejoArchivos.h"
 
 void* hiloconsola();
-int getEnumFromString ( char *string );
 void mostrarRespuesta(int respuesta);
-structInsert * cargarInserts(char * comando, bool requireTimeStamp);
 
 
 #endif /* FILESYSTEM_SRC_HILOCONSOLA_H_ */

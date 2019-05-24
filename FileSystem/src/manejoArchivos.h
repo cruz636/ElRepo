@@ -22,10 +22,16 @@ typedef struct {
 	char ** bloques;
 }structParticion;
 
-int realizarInsert(structInsert * insert);
-int realizarSelect(structSelect * select, char ** value);
-int realizarCreate(structCreate * create);
-int realizarDrop(structDrop * drop);
+typedef struct {
+	long int time;
+	int key;
+	char * value;
+}structRegistro;
+
+int realizarInsert(st_insert * insert);
+int realizarSelect(st_select * select, char ** value);
+int realizarCreate(st_create * create);
+int realizarDrop(st_drop * drop);
 bool validarArchivos(char * archivo, int* respuesta);
 
 

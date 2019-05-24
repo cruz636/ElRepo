@@ -21,7 +21,7 @@
 #include <unistd.h>
 #include "Funciones.h"
 
-struct stat mystat;
+extern struct stat mystat;
 
 extern char* magic_number;
 extern int tBloques;

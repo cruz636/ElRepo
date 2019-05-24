@@ -11,11 +11,15 @@
 #include <commons/bitarray.h>
 #include <commons/config.h>
 #include "Funciones.h"
+#include <sys/stat.h>
+#include <sys/mman.h>
 
 extern structConfig * config;
 extern t_bitarray* bitmap;
 extern int cantBloques;
 
+extern char* posicion;
+extern struct stat mystat;
 
 structMetadata * leerMetadata(char * archivo){
 	char *path;
@@ -37,13 +41,6 @@ structMetadata * leerMetadata(char * archivo){
 	return metadata;
 }
 
-char * buscarKey(int key, int particion){
-	char * value;
-
-
-	return value;
-}
-
 int verificar_bloque()
 {
 	int bit = -1;
@@ -63,6 +60,13 @@ int verificar_bloque()
 
 }
 
+void actualizar_bitmap(){
+
+	memcpy(posicion,bitmap,mystat.st_size);
+	msync(posicion,mystat.st_size,MS_SYNC);
+
+}
+
 char * armar_path(char * archivo){
 	char * path = string_new();
 	string_append(&path,config->montaje);
@@ -72,6 +76,21 @@ char * armar_path(char * archivo){
 
 	return path;
 }
+
+char * armar_PathBloque(char * bloque){
+	char * path = string_new();
+	string_append(&path,config->montaje);
+	string_append(&path,"/Bloques/");
+	string_append(&path,bloque);
+	string_append(&path,".bin");
+
+	return path;
+}
+
+/*char * path_bin(char * name, int particion){
+	char * path = armar_path(name);
+
+}*/
 
 bool crearMetadata(structCreate * c, char * path){
 	char * contenido;
@@ -102,10 +121,10 @@ int crearParticiones(structCreate * c, char * path){
 	char * contenido;
 	char * completo;
 	int bit;
-	int flag=0;
+	int flag=-1;
 
-	for (int i = 1; i <= c->numeroParticiones; i++) {
-		if(flag == 0){
+	for (int i = 0; i < c->numeroParticiones; i++) {
+		if(flag == -1){
 
 			bit = verificar_bloque();
 			if(bit == -1)
@@ -168,4 +187,34 @@ structParticion * leerParticion(char * path){
 	config_destroy(config);
 
 	return contenido;
+}
+
+void actualizar_Particion(structActualizar * a){
+	char * path = armar_path(a->nameTable);
+	char * pathPart = string_from_format("%s/%d.bin",path , a->particion);
+	t_config *configuracion;
+	int size;
+	char ** bloques;
+	int i;
+
+	configuracion = config_create(path);
+
+	size = config_get_int_value(configuracion, "SIZE");
+	config_set_value(configuracion, "SIZE", string_itoa(size+(a->size)));
+
+	bloques = config_get_array_value(configuracion, "BLOQUES");
+	while(bloques[i] != NULL) i++;
+	bloques[i] = string_itoa(a->bit);
+	bloques[i++] = NULL;
+
+	config_get_string_value(configuracion, "BLOQUES");
+
+	config_save(configuracion);
+
+	config_destroy(configuracion);
+
+	free(path);
+	free(pathPart);
+	string_iterate_lines(bloques, (void*)free);
+	free(bloques);
 }

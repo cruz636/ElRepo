@@ -18,6 +18,7 @@
 #include "hiloConsola.h"
 #include <commons/collections/dictionary.h>
 #include <commons/bitarray.h>
+#include <sys/stat.h>
 
 
 char* magic_number;
@@ -34,6 +35,8 @@ int bitm;
 structConfig * config;
 pthread_t hiloConsola, hiloSelect;
 t_dictionary * clientes, *memtable;
+
+struct stat mystat;
 
 
 int main(int argc, char *argv[]) {
