@@ -6,17 +6,22 @@
 
 void *serealizarMetaData(st_metadata *metadata, size_t *sizeBuffer) {
     st_size_metadata sizeMetadata;
+    sizeMetadata.nameTable = strlen(metadata->nameTable) + 1;
     sizeMetadata.consistency = strlen(metadata->consistency) + 1;
     sizeMetadata.partitions = sizeof(metadata->partitions);
     sizeMetadata.compaction_time = sizeof(metadata->compaction_time);
 
     *sizeBuffer =
-            sizeof(sizeMetadata) + sizeMetadata.consistency + sizeMetadata.partitions + sizeMetadata.compaction_time;
+            sizeof(sizeMetadata) + sizeMetadata.nameTable + sizeMetadata.consistency + sizeMetadata.partitions +
+            sizeMetadata.compaction_time;
     void *buffer = malloc(*sizeBuffer);
     int offset = 0;
 
     memcpy(buffer, &sizeMetadata, sizeof(sizeMetadata));
     offset += sizeof(sizeMetadata);
+
+    memcpy((buffer + offset), metadata->nameTable, sizeMetadata.nameTable);
+    offset += sizeMetadata.nameTable;
 
     memcpy((buffer + offset), metadata->consistency, sizeMetadata.consistency);
     offset += sizeMetadata.consistency;
@@ -37,6 +42,10 @@ st_metadata *deserealizarMetaData(void *buffer, size_t *sizeBuffer) {
     memcpy(&sizeMetadata, buffer, sizeof(sizeMetadata));
     offset += sizeof(sizeMetadata);
 
+    metadata->nameTable = malloc(sizeMetadata.nameTable);
+    memcpy(metadata->nameTable, (buffer + offset), sizeMetadata.nameTable);
+    offset += sizeMetadata.nameTable;
+
     metadata->consistency = malloc(sizeMetadata.consistency);
     memcpy(metadata->consistency, (buffer + offset), sizeMetadata.consistency);
     offset += sizeMetadata.consistency;
@@ -52,6 +61,7 @@ st_metadata *deserealizarMetaData(void *buffer, size_t *sizeBuffer) {
 }
 
 void destroyMetaData(st_metadata *metadata) {
+    free(metadata->nameTable);
     free(metadata->consistency);
     free(metadata);
 }
@@ -104,11 +114,11 @@ t_list *deserealizarListaMetaData(void *buffer, size_t size_buffer) {
     return lista_metadata;
 }
 
-void destroyListaMetaData(t_list * lista_metadata){
-    st_metadata * metadata;
-    int i ;
-    for (i = 0; i < lista_metadata->elements_count ; ++i) {
-        metadata = list_get(lista_metadata,i);
+void destroyListaMetaData(t_list *lista_metadata) {
+    st_metadata *metadata;
+    int i;
+    for (i = 0; i < lista_metadata->elements_count; ++i) {
+        metadata = list_get(lista_metadata, i);
         destroyMetaData(metadata);
     }
     list_destroy(lista_metadata);

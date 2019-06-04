@@ -12,6 +12,7 @@
 
 
 typedef struct {
+    char *nameTable;
     char *consistency;
     int partitions;
     int compaction_time;
@@ -19,10 +20,12 @@ typedef struct {
 } st_metadata;
 
 typedef struct {
+    size_t nameTable;
     size_t consistency;
     size_t partitions;
     size_t compaction_time;
 } __attribute__((packed)) st_size_metadata;
+
 
 void *serealizarMetaData(st_metadata *metadata, size_t *sizeBuffer);
 st_metadata *deserealizarMetaData(void *buffer, size_t *sizeBuffer);
