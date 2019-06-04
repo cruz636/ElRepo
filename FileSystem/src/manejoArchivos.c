@@ -12,37 +12,44 @@
 #include <commons/collections/list.h>
 #include <stdio.h>
 #include "Funciones.h"
+#include "operaciones.h"
+#include "buscar.h"
 
 extern t_dictionary * memtable;
 
 
-int realizarInsert(structInsert * insert){
+int realizarInsert(st_insert * insert){
 
 	int respuesta;
 	t_list * lista;
 	structMetadata * metadata;
 
-	char * value;
+	structRegistro * registro;
 
 	if(validarArchivos(insert->nameTable, &respuesta)){
 
-		value = string_new();
+		/*value = string_new();
 
 		string_append(&value,string_itoa(insert->timestamp));
 		string_append(&value,";");
 		string_append(&value,string_itoa(insert->key));
 		string_append(&value,";");
-		string_append(&value,insert->value);
+		string_append(&value,insert->value);*/
+
+		registro = malloc(sizeof(structRegistro *));
+		registro->time = insert->timestamp;
+		registro->key = insert->key;
+		registro->value = insert->value;
 
 		metadata = leerMetadata(insert->nameTable);
 		if(dictionary_has_key(memtable, insert->nameTable)){
 			lista = dictionary_get(memtable, insert->nameTable);
 
-			list_add(lista, value);
+			list_add(lista, registro);
 
 		}else{
 			lista = list_create();
-			list_add(lista, value);
+			list_add(lista, registro);
 
 			dictionary_put(memtable,insert->nameTable, lista);
 		}
@@ -56,7 +63,7 @@ int realizarInsert(structInsert * insert){
 	return respuesta;
 }
 
-int realizarSelect(structSelect * select, char ** value){
+int realizarSelect(st_select * select, char ** value){
 
 	int respuesta;
 	structMetadata * metadata;
@@ -67,7 +74,7 @@ int realizarSelect(structSelect * select, char ** value){
 
 		particion = select->key % metadata->partitions;
 
-		*value = buscarKey(select->key, particion);
+		*value = buscarKey(select->nameTable,select->key, particion);
 
 		if(*value ==NULL){
 			respuesta = 6;
@@ -82,7 +89,7 @@ int realizarSelect(structSelect * select, char ** value){
 	return respuesta;
 }
 
-int realizarCreate(structCreate * create){
+int realizarCreate(st_create * create){
 	int respuesta;
 	char * path;
 	int part;
@@ -121,7 +128,7 @@ int realizarCreate(structCreate * create){
 	return respuesta;
 }
 
-int realizarDrop(structDrop * drop){
+int realizarDrop(st_drop * drop){
 	int respuesta;
 	structMetadata * metadata;
 	char * path;

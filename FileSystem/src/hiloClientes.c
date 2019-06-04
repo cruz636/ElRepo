@@ -9,12 +9,17 @@
 
 #include <pthread.h>
 #include <funcionesCompartidas/funcionesNET.h>
+#include <funcionesCompartidas/API.h>
 #include <semaphore.h>
 #include <commons/collections/dictionary.h>
+#include "Funciones.h"
+#include "manejoArchivos.h"
+#include "operaciones.h"
 
 
 extern t_log* alog;
 extern t_dictionary * clientes;
+extern structConfig * config;
 
 void tratarCliente(int socketC){
 
@@ -34,7 +39,7 @@ void tratarCliente(int socketC){
 		{
 			case 1:
 				log_info(alog, "Recibi un Insert");
-				structInsert * insert;
+				st_insert * insert;
 
 				insert = desserealizarInsert(recibido->buffer);
 				if(insert != NULL){
@@ -58,9 +63,9 @@ void tratarCliente(int socketC){
 
 			case 2:
 				log_info(alog, "Recibi un Select");
-				structSelect * select;
+				st_select * select;
 
-				select = desserealizarSelect(recibido->buffer);
+				//select = desserealizarSelect(recibido->buffer);
 
 				if(select != NULL){
 					respuesta = realizarSelect(select, &buffer);
@@ -79,12 +84,14 @@ void tratarCliente(int socketC){
 
 			case 3:
 				log_info(alog, "Recibi un Create");
-				structCreate * create;
+				st_create * create;
 
-				create = desserealizarCreate(recibido->buffer);
+				//create = desserealizarCreate(recibido->buffer);
 
 				if(create != NULL){
 					respuesta = realizarCreate(create);
+
+					actualizar_bitmap();
 
 					enviarRespuesta(respuesta, &buffer);
 
@@ -100,12 +107,14 @@ void tratarCliente(int socketC){
 
 			case 4:
 				log_info(alog, "Recibi un Drop");
-				structDrop * drop;
+				st_drop * drop;
 
-				drop = desserealizarDrop(recibido->buffer);
+				//drop = desserealizarDrop(recibido->buffer);
 
 				if(drop != NULL){
 					respuesta = realizarDrop(drop);
+
+					actualizar_bitmap();
 
 					enviarRespuesta(respuesta, &buffer);
 
@@ -141,3 +150,6 @@ void tratarCliente(int socketC){
 	pthread_exit(NULL);
 }
 
+void enviarRespuesta(int codigo, char ** buffer){
+
+}

@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <readline/readline.h>
 #include <commons/log.h>
 #include <funcionesCompartidas/API.h>
 #include "hiloConsola.h"
@@ -17,6 +16,7 @@
 #include "manejoArchivos.h"
 #include <commons/string.h>
 #include "Funciones.h"
+#include "operaciones.h"
 
 extern t_log* alog;
 extern structConfig * config;
@@ -99,6 +99,8 @@ void* hiloconsola(){
 				if(create != NULL){
 					respuesta = realizarCreate(create);
 
+					actualizar_bitmap();
+
 					mostrarRespuesta(respuesta);
 
 				}else{
@@ -118,6 +120,8 @@ void* hiloconsola(){
 
 				if(drop != NULL){
 					respuesta = realizarDrop(drop);
+
+					actualizar_bitmap();
 
 					mostrarRespuesta(respuesta);
 
@@ -143,7 +147,6 @@ void* hiloconsola(){
 				break;
 
 			default:
-				flag = 0;
 				mostrarRespuesta(2);
 
 			}
@@ -219,6 +222,11 @@ void mostrarRespuesta(int respuesta){
 		case 10:
 			log_info(alog, "No se pudo crear la tabla");
 			printf("No se pudo crear la tabla");
+			break;
+		case 11:
+			log_info(alog, "No se pudo realizar el Insert");
+			printf("No se pudo realizar el Insert");
+			break;
 	}
 
 }
