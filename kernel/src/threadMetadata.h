@@ -5,12 +5,11 @@
 #ifndef KERNEL_THREADMETADATA_H
 #define KERNEL_THREADMETADATA_H
 
+#include <funcionesCompartidas/funcionesNET.h>
 #include <commons/collections/list.h>
+#include <funcionesCompartidas/listaMetadata.h>
+#include <funcionesCompartidas/log.h>
+#include "load_config.h"
 
-typedef struct {
-    char * tipoConsistencia;
-    char * nameTable;
-} metaDataTable;
-
-
+void * schedulerMetadata();
 #endif //KERNEL_THREADMETADATA_H

@@ -20,9 +20,9 @@ void armarComando(char *comando) {
     int typeComando = getEnumFromString(comando);
     switch (typeComando) {
         case INSERT: {
-            structInsert *insert;
+            st_insert *insert;
             flagErrorSintaxis = true;
-            if ((insert = cargarInsert(comando, true))) {
+            if ((insert = cargarInsert(comando))) {
                 crearListInstrucciones(insert, INSERT);
                 log_info(file_log, "EJECUTANDO COMANDO INSERT");
                 flagErrorSintaxis = false;
@@ -30,7 +30,7 @@ void armarComando(char *comando) {
             break;
         }
         case SELECT: {
-            structSelect *_select;
+            st_select *_select;
             flagErrorSintaxis = true;
             if ((_select = cargarSelect(comando))) {
                 crearListInstrucciones(_select, SELECT);
@@ -40,7 +40,7 @@ void armarComando(char *comando) {
             break;
         }
         case DROP: {
-            structDrop *_drop;
+            st_drop *_drop;
             flagErrorSintaxis = true;
             if ((_drop = cargarDrop(comando))) {
                 crearListInstrucciones(_drop, DROP);
@@ -50,7 +50,7 @@ void armarComando(char *comando) {
             break;
         }
         case CREATE: {
-            structCreate *_create;
+            st_create *_create;
             flagErrorSintaxis = true;
             if ((_create = cargarCreate(comando))) {
                 crearListInstrucciones(_create, CREATE);

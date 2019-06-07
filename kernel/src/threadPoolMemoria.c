@@ -51,7 +51,7 @@ void *loadPoolMemori() {
                     error = false;
                     pthread_mutex_lock(&mutex);
                     if (poolMemoria != NULL) {
-                        list_destroy(poolMemoria);
+                        destroyListaDataMemoria(poolMemoria);
                     }
                     poolMemoria = deserealizarListaDataMemoria(buffer, response.sizeData);
                     pthread_mutex_unlock(&mutex);
@@ -61,6 +61,9 @@ void *loadPoolMemori() {
             }
         }
         if (error) {
+            if (poolMemoria != NULL) {
+                destroyListaDataMemoria(poolMemoria);
+            }
             list_create(poolMemoria);
         }
         sleep(5);

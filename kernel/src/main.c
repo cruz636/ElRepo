@@ -13,6 +13,7 @@ t_log *file_log;
 config * configuracion;
 pthread_t plafinifcador;
 pthread_t pthreadMemoria;
+pthread_t pthreadMetadata;
 
 
 int inicializar(char * pathConfig){
@@ -33,9 +34,11 @@ int main(int argc, char **argv){
     }
     pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
     pthread_create(&pthreadMemoria,NULL,loadPoolMemori,NULL);
+    pthread_create(&pthreadMetadata,NULL,schedulerMetadata, NULL);
     consola();
     pthread_cancel(plafinifcador);
     pthread_cancel(pthreadMemoria);
+    pthread_cancel(pthreadMetadata);
     log_destroy(file_log);
     return 0;
 }

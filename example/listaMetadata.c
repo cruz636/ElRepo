@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <commons/string.h>
 #include <commons/collections/list.h>
 #include <funcionesCompartidas/listaMetadata.h>
 
@@ -40,16 +41,31 @@ void showLista(t_list *listaMetaData) {
     }
 }
 
+st_metadata *getTabla(char *nameTable, t_list *listMetadata) {
+    st_metadata *result = NULL;
+    int search_tabla(st_metadata *p) {
+        return string_equals_ignore_case(p->nameTable, nameTable);
+    }
+    result = list_find(listMetadata, (void *) search_tabla);
+    return result;
+}
+
 int main() {
     t_list *listametadata = list_create();
     cargarLista(listametadata);
-    size_t size_buffer;
-    void *buffer = serealizarListaMetaData(listametadata, &size_buffer);
-    t_list *lista_metadata_deserealizado = deserealizarListaMetaData(buffer, size_buffer);
-    showLista(lista_metadata_deserealizado);
-
-    //liberar memoria
-    destroyListaMetaData(lista_metadata_deserealizado);
-    destroyListaMetaData(listametadata);
-    free(buffer);
+    st_metadata *metadata = getTabla("TABLA_C",listametadata);
+    printf("%s\n", metadata->nameTable);
+    printf("%s\n", metadata->consistency);
+    printf("%d\n", metadata->partitions);
+    printf("%d\n", metadata->compaction_time);
+//    cargarLista(listametadata);
+//    size_t size_buffer;
+//    void *buffer = serealizarListaMetaData(listametadata, &size_buffer);
+//    t_list *lista_metadata_deserealizado = deserealizarListaMetaData(buffer, size_buffer);
+//    showLista(lista_metadata_deserealizado);
+//
+//    //liberar memoria
+//    destroyListaMetaData(lista_metadata_deserealizado);
+//    destroyListaMetaData(listametadata);
+//    free(buffer);
 }
